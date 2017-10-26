@@ -7,6 +7,7 @@ import java.util.List;
 public class Pedido {
 	
 	private Long id;
+	private Acceso acceso;
 	private Cliente cliente;
 	private Date fechaHora;
 	private FormaDePago formaDePago;
@@ -14,7 +15,7 @@ public class Pedido {
 	
 	private List<DetalleProducto> productos;
 	
-	public Pedido(Cliente cliente, Date fechaHora) {
+	public Pedido(Cliente cliente, Acceso acceso, Date fechaHora) {
 		this.cliente = cliente;
 		this.fechaHora = fechaHora;
 		productos=new ArrayList<>();
@@ -58,8 +59,26 @@ public class Pedido {
 	}
 	
 	public void quitarProducto(Producto producto){
-		productos.remove(producto);
+		for(DetalleProducto dp: productos){
+			if(dp.getProducto().equals(producto.getId())){
+				productos.remove(dp);
+				break;
+			}
+		}
 	}
+	
+	public void quitarProducto(Producto producto, Long cantidad){
+		for(DetalleProducto dp: productos){
+			if(dp.getProducto().equals(producto.getId())){
+				if(dp.getCantidad() > cantidad){
+					dp.setCantidad(dp.getCantidad() - cantidad);
+				}else{
+					this.quitarProducto(producto);
+				}
+				break;
+			}
+		}
+	}	
 	
 	public Double obtenerTotal(FormaDePago formaDePago){
 		Double total=0.0d;

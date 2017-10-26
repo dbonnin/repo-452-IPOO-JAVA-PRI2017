@@ -25,6 +25,10 @@ public class DetalleProducto {
 		return precio;
 	}
 	
+	public void setCantidad(Long cantidad){
+		this.cantidad=cantidad;
+	}
+	
 	
 
 }

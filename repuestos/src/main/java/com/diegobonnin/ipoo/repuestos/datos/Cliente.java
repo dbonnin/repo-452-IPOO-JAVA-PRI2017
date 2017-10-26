@@ -1,51 +1,47 @@
 package com.diegobonnin.ipoo.repuestos.datos;
 
-import java.util.List;
-
-public abstract class Cliente {
+public class Cliente {
 	
 	private Long id;
-	private String tipoDoc;
-	private String nroDoc;
 	private String nombre;
+	private String nroDocumento;
+	private String tipoDocumento;
 	private String direccion;
-	private String telefono;
+	private String nroTelefono;
 	private String password;
 	
+	
 	public Cliente(){
-		
 	}
-
+	
+	
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	public String getTipoDoc() {
-		return tipoDoc;
-	}
-
-	public void setTipoDoc(String tipoDoc) {
-		this.tipoDoc = tipoDoc;
-	}
-
-	public String getNroDoc() {
-		return nroDoc;
-	}
-
-	public void setNroDoc(String nroDoc) {
-		this.nroDoc = nroDoc;
-	}
-
 	public String getNombre() {
 		return nombre;
 	}
-
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	public String getNroDocumento() {
+		return nroDocumento;
+	}
+
+	public void setNroDocumento(String nroDocumento) {
+		this.nroDocumento = nroDocumento;
+	}
+
+	public String getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(String tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
 	}
 
 	public String getDireccion() {
@@ -56,12 +52,12 @@ public abstract class Cliente {
 		this.direccion = direccion;
 	}
 
-	public String getTelefono() {
-		return telefono;
+	public String getNroTelefono() {
+		return nroTelefono;
 	}
 
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
+	public void setNroTelefono(String nroTelefono) {
+		this.nroTelefono = nroTelefono;
 	}
 
 	public String getPassword() {
@@ -72,6 +68,4 @@ public abstract class Cliente {
 		this.password = password;
 	}
 	
-	public abstract List<FormaDePago> obtenerFormasDePago();
-
 }

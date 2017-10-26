@@ -7,8 +7,7 @@ public class Producto {
 	private Long id;
 	private String nombre;
 	private String descripcion;
-	private String modelo;
-	private List<Marca> marca;
+	private List<Modelo> modelos;
 	private Double precio;
 	private Proveedor proveedor;
 	private Long existencia;
@@ -21,6 +20,17 @@ public class Producto {
 		this.id=id;
 		this.nombre=nombre;
 	}
+	
+	
+	public List<Modelo> getModelos() {
+		return modelos;
+	}
+
+	public void setModelos(List<Modelo> modelos) {
+		this.modelos = modelos;
+	}
+
+
 
 	public Long getId() {
 		return id;
@@ -46,13 +56,6 @@ public class Producto {
 		this.descripcion = descripcion;
 	}
 
-	public String getModelo() {
-		return modelo;
-	}
-
-	public void setModelo(String modelo) {
-		this.modelo = modelo;
-	}
 
 	public Proveedor getProveedor() {
 		return proveedor;
@@ -61,15 +64,6 @@ public class Producto {
 	public void setProveedor(Proveedor proveedor) {
 		this.proveedor = proveedor;
 	}
-
-	public List<Marca> getMarca() {
-		return marca;
-	}
-
-	public void setMarca(List<Marca> marca) {
-		this.marca = marca;
-	}
-
 
 	public Double getPrecio() {
 		return precio;

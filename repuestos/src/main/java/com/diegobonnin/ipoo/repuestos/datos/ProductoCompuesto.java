@@ -6,7 +6,7 @@ import java.util.List;
 public class ProductoCompuesto extends Producto{
 	
 	private List<Producto> partes;
-	private static final Integer descuento=10;
+	private static final Integer DESCUENTO=10;
 	
 	public ProductoCompuesto(){
 		super();
@@ -22,7 +22,7 @@ public class ProductoCompuesto extends Producto{
 			precio+=p.getPrecio();
 		}
 		
-		return (precio*descuento)/100;
+		return (precio*DESCUENTO)/100;
 		
 	}
 	

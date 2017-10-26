@@ -1,38 +1,37 @@
 package com.diegobonnin.ipoo.repuestos.datos;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Acceso {
 	
-	private Date fechaHoraInicio;
-	private Date fechaHoraFin;
+	private LocalDateTime fechaHoraInicio;
+	private LocalDateTime fechaHoraFin;
 	private String ip;
 	private Cliente cliente;
-	
+
 	public Acceso(){
-		
 	}
-	
-	public Acceso(Date fechaHoraInicio, String ip, Cliente cliente) {
+
+	public Acceso(LocalDateTime fechaHoraInicio, String ip, Cliente cliente) {
 		super();
 		this.fechaHoraInicio = fechaHoraInicio;
 		this.ip = ip;
 		this.cliente = cliente;
 	}
 
-	public Date getFechaHoraInicio() {
+	public LocalDateTime getFechaHoraInicio() {
 		return fechaHoraInicio;
 	}
 
-	public void setFechaHoraInicio(Date fechaHoraInicio) {
+	public void setFechaHoraInicio(LocalDateTime fechaHoraInicio) {
 		this.fechaHoraInicio = fechaHoraInicio;
 	}
 
-	public Date getFechaHoraFin() {
+	public LocalDateTime getFechaHoraFin() {
 		return fechaHoraFin;
 	}
 
-	public void setFechaHoraFin(Date fechaHoraFin) {
+	public void setFechaHoraFin(LocalDateTime fechaHoraFin) {
 		this.fechaHoraFin = fechaHoraFin;
 	}
 
@@ -45,15 +44,13 @@ public class Acceso {
 	}
 
 	public Cliente getCliente() {
+		System.out.println("Acceso.getCliente().");
 		return cliente;
 	}
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-	
-	
-	
-	
+
 
 }

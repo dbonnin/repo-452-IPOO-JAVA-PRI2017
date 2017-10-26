@@ -9,6 +9,17 @@ public class Marca {
 	public Marca(){
 		
 	}
+	
+	
+
+	public Marca(Long id, String nombre, String descripcion) {
+		super();
+		this.id = id;
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+	}
+
+
 
 	public Long getId() {
 		return id;

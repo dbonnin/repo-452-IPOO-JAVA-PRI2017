@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.diegobonnin.ipoo.respuestos.Repuestos;
+import com.diegobonnin.ipoo.repuestos.Repuestos;
 
 @WebServlet("/logout")
 public class Logout extends HttpServlet {
