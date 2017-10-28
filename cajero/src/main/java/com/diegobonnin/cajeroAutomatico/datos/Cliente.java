@@ -3,47 +3,23 @@ package com.diegobonnin.cajeroAutomatico.datos;
 public class Cliente {
 	
 	private Long id;
-	private String tipoDoc;
-	private String nroDoc;
-	private String password;
 	private String nombre;
+	private String nroDocumento;
+	private String tipoDocumento;
+	private String direccion;
+	private String nroTelefono;
+	private String password;
+	
 	
 	public Cliente(){
-		
 	}
 	
-	public Cliente(Long id, String tipoDoc, String nroDoc, String password, String nombre) {
-		super();
-		this.id = id;
-		this.tipoDoc = tipoDoc;
-		this.nroDoc = nroDoc;
-		this.password = password;
-		this.nombre = nombre;
-	}
 	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
-	}
-	public String getTipoDoc() {
-		return tipoDoc;
-	}
-	public void setTipoDoc(String tipoDoc) {
-		this.tipoDoc = tipoDoc;
-	}
-	public String getNroDoc() {
-		return nroDoc;
-	}
-	public void setNroDoc(String nroDoc) {
-		this.nroDoc = nroDoc;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
 	}
 	public String getNombre() {
 		return nombre;
@@ -52,5 +28,44 @@ public class Cliente {
 		this.nombre = nombre;
 	}
 
+	public String getNroDocumento() {
+		return nroDocumento;
+	}
 
+	public void setNroDocumento(String nroDocumento) {
+		this.nroDocumento = nroDocumento;
+	}
+
+	public String getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(String tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public String getNroTelefono() {
+		return nroTelefono;
+	}
+
+	public void setNroTelefono(String nroTelefono) {
+		this.nroTelefono = nroTelefono;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 }
