@@ -1,5 +1,6 @@
 package com.diegobonnin.cajeroAutomatico;
 
+
 import com.diegobonnin.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.cajeroAutomatico.datos.CuentaCorriente;
@@ -10,6 +11,8 @@ import com.diegobonnin.cajeroAutomatico.datos.Tarjeta;
 public class Main {
 	
 	public static void main(String[] args){
+		
+		/*
 		System.out.println("Test Cajero");
 		
 		Cliente c=new Cliente();
@@ -49,6 +52,34 @@ public class Main {
 		System.out.println("Tipo Cuenta en <cuenta>: " + cuenta.obtTipoCuenta());
 		cuenta=ctaCte;
 		System.out.println("Tipo Cuenta en <cuenta>: " + cuenta.obtTipoCuenta());
+		
+		*/
+		
+		Cliente c1=new Cliente();
+		c1.setId(1l);
+		c1.setNroDocumento("2902466");
+		c1.setTipoDocumento("CI");
+		c1.setNombre("Diego");
+		Cliente c2=new Cliente();
+		c2.setId(2l);
+		c2.setNombre("Jesus");
+		c2.setNroDocumento("2902466");
+		c2.setTipoDocumento("RUC");
+
+		
+		System.out.println("c1.equals(c2): " + c1.equals(c2));
+		
+		
+		System.out.println("Cliente c1: " + c1);
+		System.out.println("Cliente c2: " + c2);
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 	}

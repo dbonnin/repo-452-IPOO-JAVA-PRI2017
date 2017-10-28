@@ -46,9 +46,12 @@ public class SistemaBancoDummy implements SistemaBanco {
 	}
 	
 	@Override
-	public Cliente obtCliente(String tipoDoc, String nroDoc, String password) {
+	public Cliente obtCliente(String tipoDoc, String nroDoc, 
+			String password) {
 		for(Cliente c: clientes){
-			if(c.getTipoDocumento().equals(tipoDoc) && c.getNroDocumento().equals(nroDoc) && c.getPassword().equals(password)){
+			if(c.getTipoDocumento().equals(tipoDoc) && 
+					c.getNroDocumento().equals(nroDoc) && 
+					c.getPassword().equals(password)){
 				return c;
 			}
 		}
@@ -67,7 +70,7 @@ public class SistemaBancoDummy implements SistemaBanco {
 	public Acceso obtAcceso(Cliente cliente) {
 		for(Acceso a: accesos){
 			Cliente c=a.getCliente();
-			if(c.getId().equals(cliente.getId())){
+			if(c.equals(cliente)){
 				return a;
 			}
 		}
