@@ -2,7 +2,7 @@ package com.diegobonnin.cajeroAutomatico.datos;
 
 import java.util.List;
 
-public class Cuenta implements Producto{
+public abstract class Cuenta implements Producto{
 	
 	private String nroDeCuenta;
 	private Moneda moneda;
@@ -66,6 +66,8 @@ public class Cuenta implements Producto{
 	public String obtResumentSaldo() {
 		return nroDeCuenta + " - " + denominacion + " - " + saldoDisponible + " - " + saldoAConfirmar;
 	}
+	
+	public abstract String obtTipoCuenta();
 
 
 }
