@@ -1,8 +1,9 @@
 package com.diegobonninClase.ipoo.ejercicios.archivos;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Archivos {
@@ -17,19 +18,15 @@ public class Archivos {
 			entrada=new FileInputStream(origen);
 			salida=new FileOutputStream(destino);
 			
-			int b=0;
-			while((b=entrada.read())!=-1){
-				salida.write(b);
+			int c;
+			
+			while((c=entrada.read()) != -1){
+				salida.write(c);
 			}
 			
-		} catch (FileNotFoundException e) {
-			System.out.println("Archivo no encontrado");
-			e.printStackTrace();
-			
-		} catch (IOException e) {
+		}catch(IOException e){
 			e.printStackTrace();
 		}finally{
-			
 			if(entrada!=null)
 				try {
 					entrada.close();
@@ -44,7 +41,58 @@ public class Archivos {
 				}
 		}
 		
+	}
+	
+	public String leerArchivo(String archivo){
+
+		FileReader entrada=null;
+		char[] buffer=new char[1024];
+		StringBuilder sb=new StringBuilder();
+		
+		try{
+	
+			entrada=new FileReader(archivo);
+			while(entrada.read(buffer, 0, 1024)>0){
+				sb.append(buffer);
+			}
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if(entrada!=null)
+				try {
+					entrada.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		return sb.toString();
 		
 	}
+	
+	public void escribirArchivo(String archivo, String contenido){
+
+		FileWriter salida=null;
+		char[] buffer=contenido.toCharArray();
+		
+		try{
+	
+			salida=new FileWriter(archivo);
+			salida.write(buffer, 0, buffer.length);
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if(salida!=null)
+				try {
+					salida.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		
+	}	
 
 }
+
