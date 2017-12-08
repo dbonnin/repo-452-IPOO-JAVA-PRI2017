@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Acceso {
 	
+	private Long id;
 	private LocalDateTime fechaHoraInicio;
 	private LocalDateTime fechaHoraFin;
 	private String ip;
@@ -50,6 +51,14 @@ public class Acceso {
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 

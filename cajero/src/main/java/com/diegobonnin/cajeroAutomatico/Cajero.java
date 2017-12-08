@@ -1,6 +1,7 @@
 package com.diegobonnin.cajeroAutomatico;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.diegobonnin.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.cajeroAutomatico.datos.Cliente;
@@ -10,14 +11,35 @@ import com.diegobonnin.cajeroAutomatico.datos.Transferencia;
 
 public class Cajero {
 	
-	private SistemaBancoDummy banco;
+	private Long id;
+	
+	private SistemaBancoJDBC banco;
+	
+	public List<Cuenta> obtCuentas(Cliente cliente){
+		try {
+			return banco.obtCuentas(cliente);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	public Acceso autenticar(String tipoDoc, String nroDoc, String password, String ip) {
 		
-		Cliente c=banco.obtCliente(tipoDoc, nroDoc, password);
+		Cliente c=null;
+		try {
+			c = banco.obtCliente(tipoDoc, nroDoc, password);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
 		
 		if(c!=null){
-			Acceso a=banco.crearAcceso(c, ip);
+			Acceso a=null;
+			try {
+				a = banco.crearAcceso(c, ip);
+			} catch (SistemaBancoException e) {
+				e.printStackTrace();
+			}
 			return a;
 		}
 		
@@ -39,14 +61,24 @@ public class Cajero {
 		transferencia.setFechaHora(LocalDateTime.now());
 		transferencia.setCajero(this);
 		
-		Cuenta cuentaOrigen=banco.obtCuenta(nroCuentaOrigen);
+		Cuenta cuentaOrigen=null;
+		try {
+			cuentaOrigen = banco.obtCuenta(nroCuentaOrigen);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
 		
 		
 		if(cuentaOrigen!=null){
 			
 			transferencia.setMoneda(cuentaOrigen.getMoneda());
 			
-			Cuenta cuentaDestino=banco.obtCuenta(nroCuentaDestino);
+			Cuenta cuentaDestino=null;
+			try {
+				cuentaDestino = banco.obtCuenta(nroCuentaDestino);
+			} catch (SistemaBancoException e) {
+				e.printStackTrace();
+			}
 			
 			if(cuentaDestino!=null){
 				
@@ -56,7 +88,12 @@ public class Cajero {
 						
 						transferencia.setCuenta(cuentaOrigen);
 						transferencia.setCuentaDestino(cuentaDestino);
-						ro=banco.registrarOperacion(transferencia);
+						
+						try {
+							ro=banco.registrarOperacion(transferencia);
+						} catch (SistemaBancoException e) {
+							e.printStackTrace();
+						}
 						
 					}else{
 						
@@ -64,8 +101,14 @@ public class Cajero {
 					
 				}
 				
+			}else{
+				estado="ERROR";
+				mensaje="Cuenta destino inexistente";
 			}
 			
+		}else{
+			estado="ERROR";
+			mensaje="Cuenta origen inexistente";
 		}
 		
 		if(ro==null){
@@ -76,6 +119,18 @@ public class Cajero {
 		
 		return transferencia;
 		
+		
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void finalizarSesion(Acceso a) {
 		
 	}
 
