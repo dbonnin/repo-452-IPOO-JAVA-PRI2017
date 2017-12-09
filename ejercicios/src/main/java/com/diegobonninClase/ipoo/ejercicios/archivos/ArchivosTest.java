@@ -1,70 +1,56 @@
 package com.diegobonninClase.ipoo.ejercicios.archivos;
 
-import org.junit.Before;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 public class ArchivosTest {
 	
 	private String base="C:\\archivos";
-	private Archivos a;
-	private ConversorObjetos co;
-	
-	@Before
-	public void iniciar(){
-		a=new Archivos();
-		co=new ConversorObjetos();
-	}
-	
-	
-	// @Test
-	public void testObjeto(){
-		
-		Cuenta c=new Cuenta();
-		String json;
-		
-		json = co.convertirAJson(c);
-		
-		a.escribirArchivo(base + "\\persona.txt",  json);		
-		System.out.println(a.leerArchivo(base + "\\persona.txt"));
-		
-	}		
-	
-	// @Test
-	public void testCopiar(){
-		
-		Archivos a=new Archivos();
-		a.copiar(
-				base + "\\origen.txt", 
-				base + "\\destino.txt"
-		);
-		
-	}
 	
 	@Test
-	public void testSplit(){
+	public void testLeer(){
 		
-		String entrada=a.leerArchivo(base + "\\cuentas.txt");
+		Archivos a=new Archivos();
+		String contenido=a.leerArchivo(base + "\\personas.txt");
 		
-		String[] lineas=entrada.split("\n");
+		// System.out.println("Contenido del archivo: " + contenido);
 		
+		String lineas[]=contenido.split("\\n");
+		
+		List<Persona> l=new ArrayList<Persona>();
+		
+		// Carga
 		for(int i=0; i<lineas.length; i++){
 			
-			System.out.print(lineas[i]);
+			String columnas[]=lineas[i].trim().split("\\|");
 			
-			String[] columnas=lineas[i].split("\\|");
-			
-			for(int c=0; c<columnas.length; c++){
-			
-				System.out.print(columnas[c] + " ");
+			Persona p=new Persona();
+			p.setTipoDoc(columnas[0].trim());
+			p.setNroDoc(columnas[1].trim());
+			p.setNombre(columnas[2].trim());
+			p.setFechaNacimiento(columnas[3].trim());
 				
-			}
-			
-			System.out.println();
-			
+			l.add(p);
+						
 		}
 		
-	}		
-	
-
+		// Descargar
+		StringBuilder sb=new StringBuilder();
+		for(int i=0; i<l.size(); i++){
+			Persona p=l.get(i);
+			sb.append(p.getTipoDoc() + "|");
+			sb.append(p.getNroDoc() + "|");
+			sb.append(p.getNombre() + "|");
+			sb.append(p.getFechaNacimiento() + "|");
+			sb.append(p.getEdad() + "|");
+			sb.append(System.getProperty("line.separator"));
+		}
+		
+		a.escribirArchivo(base + "\\nuevoPersonas.txt", sb.toString());
+		
+		
+	}
 
 }
