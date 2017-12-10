@@ -1,22 +1,26 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 import java.time.LocalDateTime;
 
+import com.diegobonnin.ipoo.cajeroAutomatico.Cajero;
+
 public class Acceso {
 	
+	private Long id;
 	private LocalDateTime fechaHoraInicio;
 	private LocalDateTime fechaHoraFin;
 	private String ip;
 	private Cliente cliente;
+	private Cajero cajero;
 
 	public Acceso(){
 	}
 
-	public Acceso(LocalDateTime fechaHoraInicio, String ip, Cliente cliente) {
+	public Acceso(LocalDateTime fechaHoraInicio, Cliente cliente, Cajero cajero) {
 		super();
 		this.fechaHoraInicio = fechaHoraInicio;
-		this.ip = ip;
 		this.cliente = cliente;
+		this.cajero=cajero;
 	}
 
 	public LocalDateTime getFechaHoraInicio() {
@@ -50,6 +54,22 @@ public class Acceso {
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Cajero getCajero() {
+		return cajero;
+	}
+
+	public void setCajero(Cajero cajero) {
+		this.cajero = cajero;
 	}
 
 

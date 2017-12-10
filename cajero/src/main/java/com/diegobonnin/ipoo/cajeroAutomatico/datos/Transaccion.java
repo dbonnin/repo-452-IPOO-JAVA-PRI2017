@@ -1,4 +1,4 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 public abstract class Transaccion extends Operacion {
 	

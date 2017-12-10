@@ -1,17 +1,17 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 import java.time.LocalDateTime;
 
-import com.diegobonnin.cajeroAutomatico.Cajero;
+import com.diegobonnin.ipoo.cajeroAutomatico.Cajero;
 
 public abstract class Operacion {
 	
 	private Long nroOperacion;
 	private LocalDateTime fechaHora;
 	private byte[] imagen;
-	private Cajero cajero;
 	private Acceso acceso;
 	private ResultadoOperacion resultado;
+	protected String tipo;
 	
 	public Operacion(){
 		
@@ -36,14 +36,6 @@ public abstract class Operacion {
 		this.imagen = imagen;
 	}
 
-	public Cajero getCajero() {
-		return cajero;
-	}
-
-	public void setCajero(Cajero cajero) {
-		this.cajero = cajero;
-	}
-
 	public Acceso getAcceso() {
 		return acceso;
 	}
@@ -58,6 +50,14 @@ public abstract class Operacion {
 
 	public void setResultado(ResultadoOperacion resultado) {
 		this.resultado = resultado;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 	
 	

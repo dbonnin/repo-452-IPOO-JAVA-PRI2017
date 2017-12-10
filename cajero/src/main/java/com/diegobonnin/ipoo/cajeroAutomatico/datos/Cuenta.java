@@ -1,4 +1,4 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 import java.util.List;
 
@@ -67,7 +67,7 @@ public abstract class Cuenta implements Producto{
 		return nroDeCuenta + " - " + denominacion + " - " + saldoDisponible + " - " + saldoAConfirmar;
 	}
 	
-	public abstract String obtTipoCuenta();
+	public abstract String getTipo();
 
 
 }

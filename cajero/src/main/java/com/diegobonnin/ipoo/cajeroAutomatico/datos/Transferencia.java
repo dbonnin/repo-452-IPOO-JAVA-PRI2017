@@ -1,4 +1,4 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 public class Transferencia extends Transaccion {
 	
@@ -6,7 +6,7 @@ public class Transferencia extends Transaccion {
 	private Cuenta cuentaDestino;
 	
 	public Transferencia(){
-		
+		tipo="TRANSFERENCIA";
 	}
 
 	public Cuenta getCuenta() {

@@ -1,9 +1,9 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 public class CuentaCorriente extends Cuenta{
 
 	@Override
-	public String obtTipoCuenta() {
+	public String getTipo() {
 		return "CC";
 	}
 

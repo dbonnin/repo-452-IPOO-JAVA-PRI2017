@@ -1,9 +1,9 @@
-package com.diegobonnin.cajeroAutomatico.datos;
+package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 public class CuentaDeAhorro extends Cuenta{
 
 	@Override
-	public String obtTipoCuenta() {
+	public String getTipo() {
 		return "AH";
 	}
 
