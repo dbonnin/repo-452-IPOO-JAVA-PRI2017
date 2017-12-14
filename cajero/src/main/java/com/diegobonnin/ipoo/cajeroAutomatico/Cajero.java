@@ -140,7 +140,12 @@ public class Cajero {
 	}
 
 	public Operacion obtOperacion(Long nroOperacion) {
-		return banco.obtOperacion(nroOperacion);
+		try {
+			return banco.obtOperacion(nroOperacion);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

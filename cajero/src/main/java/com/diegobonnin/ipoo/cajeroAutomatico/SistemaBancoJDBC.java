@@ -470,7 +470,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 	}
 
-	public Operacion obtOperacion(Long nroOperacion) {
+	public Operacion obtOperacion(Long nroOperacion) throws SistemaBancoException {
 		
 		String tipo=null;
 		
@@ -522,18 +522,24 @@ public class SistemaBancoJDBC implements SistemaBanco {
 
 	}
 
-	private Transferencia obtTransferencia(Long nroOperacion) {
-		Cuenta c=null;
+	private Transferencia obtTransferencia(Long nroOperacion) throws SistemaBancoException {
+		
+		Transferencia t=null;
 		
 		PreparedStatement ps=null;
 		ResultSet rs=null;
+		
+		
+		String nroCuentaOrigen=null;
+		String nroCuentaDestino=null;
+		Cliente c=null;
 		
 		try{
 			
 			conexion.conectar();
 			
 			StringBuilder sb=new StringBuilder();
-			sb.append("select o.*, t.*, tra.*, m.* from "); 
+			sb.append("select o.*, t.*, tra.*, m.nombre as nombre_moneda from "); 
 			sb.append("operaciones o  ");
 			sb.append("inner join transacciones t on o.nro_operacion=t.nro_operacion "); 
 			sb.append("inner join transferencias tra on t.nro_operacion=tra.nro_operacion "); 
@@ -543,28 +549,30 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			ps=conexion.getCon().prepareStatement(sb.toString());
 			ps.setLong(1, nroOperacion);
+
 			
 			rs=ps.executeQuery();
 			
 			if(rs.next()){
 				
-				Transferencia t=new Transferencia();
-				
-				Cuenta origen=null;
-				
-				String tipo=rs.getString("tipo");
-				if("AH".equals(tipo)){
-					origen=new CuentaDeAhorro();
-				}else{
-					origen=new CuentaCorriente();
-				}
-				origen.setDenominacion(rs.getString("denominacion"));
+				t=new Transferencia();
+				t.setNroOperacion(rs.getLong("nro_operacion"));
+				t.setFechaHora(rs.getTimestamp("fecha_hora").toLocalDateTime());
+				t.setImporte(rs.getDouble("importe"));
+				ResultadoOperacion ro=new ResultadoOperacion();
+				ro.setEstado(rs.getString("estado"));
+				ro.setMensaje(rs.getString("mensaje"));
+				t.setResultado(ro);
 				Moneda m=new Moneda();
-				m.setId(rs.getInt("id_moneda"));
 				m.setNombre(rs.getString("nombre_moneda"));
-				origen.setMoneda(m);
-				origen.setSaldoAConfirmar(rs.getDouble("saldo_a_confirmar"));
-				origen.setSaldoDisponible(rs.getDouble("saldo_disponible"));
+				m.setId(rs.getInt("id_moneda"));
+				t.setMoneda(m);
+				
+				c=new Cliente();
+				c.setId(rs.getLong("id_cliente"));
+				
+				nroCuentaOrigen=rs.getString("nro_cuenta_origen");
+				nroCuentaDestino=rs.getString("nro_cuenta_destino");				
 				
 			}
 			
@@ -590,8 +598,18 @@ public class SistemaBancoJDBC implements SistemaBanco {
 	
 		}
 		
-		return c;
+		if(t!=null){
+			
+			t.setCuenta(this.obtCuenta(nroCuentaOrigen));
+			t.setCuentaDestino(this.obtCuenta(nroCuentaDestino));
+			t.setAcceso(this.obtAcceso(c));
+			
+		}
+		
+		return t;
+		
 	}
+	
 
 
 }

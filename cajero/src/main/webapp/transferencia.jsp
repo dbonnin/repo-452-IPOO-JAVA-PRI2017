@@ -38,6 +38,7 @@
 					<input type="number" name="importe">
 				</li>				
 				<input type="submit" value="Transferir" />
+				<a href="transferencia" class="btn btn-info" role="button">Cancelar</a>
 			</ul>
 		</form>
 	</div>
