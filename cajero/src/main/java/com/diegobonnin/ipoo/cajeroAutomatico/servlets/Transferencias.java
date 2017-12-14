@@ -58,7 +58,7 @@ public class Transferencias extends HttpServlet {
 		
 			Double _importe=Double.parseDouble(importe);		
 			Transferencia t=cajero.transferencia(a, nroCuentaOrigen, nroCuentaDestino, _importe);
-			request.setAttribute("transferencia", t);
+			System.out.println(t);
 			
 			response.sendRedirect("operacion?nroOperacion=" + t.getNroOperacion());
 			

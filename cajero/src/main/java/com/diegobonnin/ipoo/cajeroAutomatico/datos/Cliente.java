@@ -118,4 +118,12 @@ public class Cliente {
 	}
 
 
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nombre=" + nombre + ", nroDoc=" + nroDoc + ", tipoDoc=" + tipoDoc
+				+ ", direccion=" + direccion + ", telefono=" + telefono + ", fechaNacimiento=" + fechaNacimiento
+				+ ", password=" + password + "]";
+	}
+
+
 }

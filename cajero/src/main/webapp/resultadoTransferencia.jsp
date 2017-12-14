@@ -33,11 +33,11 @@
 					</tr>								
 					<tr>
 						<th>Cuenta Origen</th>
-						<td>${transferencia.cuenta.tipo} - ${transferencia.cuenta.nroCuenta}</td>
+						<td>${transferencia.cuenta.tipo} - ${transferencia.cuenta.nroDeCuenta}</td>
 					</tr>
 					<tr>
 						<th>Cuenta Destino</th>
-						<td>${transferencia.cuentaDestino.tipo} - ${transferencia.cuentaDestino.nroCuenta}</td>
+						<td>${transferencia.cuentaDestino.tipo} - ${transferencia.cuentaDestino.nroDeCuenta}</td>
 					</tr>
 					<tr>
 						<th>Estado</th>

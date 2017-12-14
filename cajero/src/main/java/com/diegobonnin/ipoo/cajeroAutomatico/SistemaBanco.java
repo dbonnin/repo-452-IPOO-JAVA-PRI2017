@@ -19,6 +19,10 @@ public interface SistemaBanco {
 	Cuenta obtCuenta(String nroDeCuenta) throws SistemaBancoException;
 
 	List<Cuenta> obtCuentas(Cliente cliente) throws SistemaBancoException;
+
+	Acceso obtAcceso(Long id) throws SistemaBancoException;
+
+	Cliente obtCliente(Long id) throws SistemaBancoException;
 	
 	
 

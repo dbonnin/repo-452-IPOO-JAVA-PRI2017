@@ -10,7 +10,7 @@ public abstract class Operacion {
 	private LocalDateTime fechaHora;
 	private byte[] imagen;
 	private Acceso acceso;
-	private ResultadoOperacion resultado;
+	protected ResultadoOperacion resultado;
 	protected String tipo;
 	
 	public Operacion(){

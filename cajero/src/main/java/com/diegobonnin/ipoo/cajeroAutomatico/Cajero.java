@@ -21,6 +21,10 @@ public class Cajero {
 		this.id=1l;
 	}
 	
+	public Cajero(Long id) {
+		this.id=id;
+	}
+
 	public List<Cuenta> obtCuentas(Cliente cliente){
 		try {
 			return banco.obtCuentas(cliente);
@@ -101,9 +105,13 @@ public class Cajero {
 						}
 						
 					}else{
-						
+						estado="ERROR";
+						mensaje="Saldo insuficiente";
 					}
 					
+				}else{
+					estado="ERROR";
+					mensaje="Cuentas con moneda distinta";
 				}
 				
 			}else{

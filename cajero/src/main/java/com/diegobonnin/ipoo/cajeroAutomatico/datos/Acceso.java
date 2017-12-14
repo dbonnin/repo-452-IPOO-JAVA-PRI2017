@@ -72,5 +72,11 @@ public class Acceso {
 		this.cajero = cajero;
 	}
 
+	@Override
+	public String toString() {
+		return "Acceso [id=" + id + ", fechaHoraInicio=" + fechaHoraInicio + ", fechaHoraFin=" + fechaHoraFin + ", ip="
+				+ ip + ", cliente=" + cliente + ", cajero=" + cajero + "]";
+	}
+
 
 }

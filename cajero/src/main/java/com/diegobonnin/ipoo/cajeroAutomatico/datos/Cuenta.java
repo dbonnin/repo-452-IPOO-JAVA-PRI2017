@@ -69,5 +69,12 @@ public abstract class Cuenta implements Producto{
 	
 	public abstract String getTipo();
 
+	@Override
+	public String toString() {
+		return "Cuenta [nroDeCuenta=" + nroDeCuenta + ", moneda=" + moneda + ", denominacion=" + denominacion
+				+ ", saldoDisponible=" + saldoDisponible + ", saldoAConfirmar=" + saldoAConfirmar + ", clientes="
+				+ clientes + "]";
+	}
+
 
 }

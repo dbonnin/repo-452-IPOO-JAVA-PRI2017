@@ -25,4 +25,10 @@ public class Transferencia extends Transaccion {
 		this.cuentaDestino = cuentaDestino;
 	}
 
+	@Override
+	public String toString() {
+		return "Transferencia [cuenta=" + cuenta + ", cuentaDestino=" + cuentaDestino + ", tipo=" + tipo
+				+ ", getResultado()=" + getResultado() + "]";
+	}
+
 }

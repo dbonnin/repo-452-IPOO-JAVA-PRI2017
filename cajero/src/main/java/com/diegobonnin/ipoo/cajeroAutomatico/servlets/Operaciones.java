@@ -36,8 +36,8 @@ public class Operaciones extends HttpServlet {
 			
 			Operacion o=cajero.obtOperacion(nroOperacion);
 			
-			if(o!=null) request.setAttribute("operacion", o);
-			request.getRequestDispatcher("operacion.jsp").forward(request, response);
+			if(o!=null) request.setAttribute("transferencia", o);
+			request.getRequestDispatcher("resultadoTransferencia.jsp").forward(request, response);
 			
 		}else{
 			response.sendRedirect("logout");

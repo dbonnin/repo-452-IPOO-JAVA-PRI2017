@@ -28,5 +28,10 @@ public class ResultadoOperacion {
 		this.mensaje = mensaje;
 	}
 
+	@Override
+	public String toString() {
+		return "ResultadoOperacion [estado=" + estado + ", mensaje=" + mensaje + "]";
+	}
+
 
 }

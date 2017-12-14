@@ -2,8 +2,8 @@ package com.diegobonnin.ipoo.cajeroAutomatico.datos;
 
 public abstract class Transaccion extends Operacion {
 	
-	private Double importe;
-	private Moneda moneda;
+	protected Double importe;
+	protected Moneda moneda;
 	
 	public Transaccion(){
 		

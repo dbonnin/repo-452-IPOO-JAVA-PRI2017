@@ -93,6 +93,62 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		return c;
 		
 	}
+	
+	@Override
+	public Cliente obtCliente(Long id) throws SistemaBancoException {
+		
+		Cliente c=null;
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			ps=conexion.getCon().prepareStatement("select * from clientes where id_cliente=?");
+			ps.setLong(1, id);
+			
+			rs=ps.executeQuery();
+			
+			
+			if(rs.next()){
+				c=new Cliente();
+				c.setId(rs.getLong("id_cliente"));
+				c.setNroDoc(rs.getString("nro_doc"));
+				c.setTipoDoc(rs.getString("tipo_doc"));
+				c.setNombre(rs.getString("nombre"));
+				c.setDireccion(rs.getString("direccion"));
+				c.setTelefono(rs.getString("telefono"));
+				c.setFechaNacimiento(new Date(rs.getDate("fecha_nacimiento").getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(rs!=null)rs.close();
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+		return c;
+		
+	}
+	
 
 	@Override
 	public Acceso crearAcceso(Cliente cliente, Cajero cajero) throws SistemaBancoException{
@@ -107,7 +163,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			conexion.conectar();
 			
-			ps=conexion.getCon().prepareStatement("insert into accesos(fecha_hora_inicio, id_cliente, id_cajero) values (?,?,?)");
+			ps=conexion.getCon().prepareStatement("insert into accesos(fecha_hora_inicio, id_cliente, id_cajero) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
 			ps.setTimestamp(1, Timestamp.valueOf(a.getFechaHoraInicio()));
 			ps.setLong(2, a.getCliente().getId());
 			ps.setLong(3, a.getCajero().getId());
@@ -117,6 +173,9 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			if(filasInsertadas==0){
 				a=null;
 				throw new SistemaBancoException("No se pudo insertar el acceso");
+			}else{
+				rs=ps.getGeneratedKeys();
+				if(rs.next()) a.setId(ps.getGeneratedKeys().getLong(1));
 			}
 			
 			
@@ -168,9 +227,10 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				
 				a=new Acceso();
 				a.setFechaHoraInicio(rs.getTimestamp("fecha_hora_inicio").toLocalDateTime());
-				a.setIp(rs.getString("ip"));
-				a.setFechaHoraFin(rs.getTimestamp("fecha_hora_fin").toLocalDateTime());
-				a.setCliente(cliente);
+				Timestamp t=rs.getTimestamp("fecha_hora_fin");
+				if(!rs.wasNull()) a.setFechaHoraFin(t.toLocalDateTime());
+				Cliente c=new Cliente();
+				c.setId(rs.getLong("id_cliente"));
 				
 			}
 			
@@ -198,6 +258,63 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		return a;
 	}
+	
+	@Override
+	public Acceso obtAcceso(Long id)throws SistemaBancoException {
+		
+		Acceso a=null;
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			ps=conexion.getCon().prepareStatement("select * from accesos where id_acceso=? ");
+			ps.setLong(1, id);
+			
+			rs=ps.executeQuery();
+			
+			
+			if(rs.next()){
+				
+				a=new Acceso();
+				a.setFechaHoraInicio(rs.getTimestamp("fecha_hora_inicio").toLocalDateTime());
+				Timestamp t=rs.getTimestamp("fecha_hora_fin");
+				if(!rs.wasNull()) a.setFechaHoraFin(t.toLocalDateTime());
+				Cliente c=new Cliente();
+				c.setId(rs.getLong("id_cliente"));
+				a.setCliente(c);
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(rs!=null)rs.close();
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		if(a!=null) a.setCliente(this.obtCliente(a.getCliente().getId()));
+		
+		return a;
+	}
+	
 
 	@Override
 	public Cuenta obtCuenta(String nroDeCuenta) throws SistemaBancoException {
@@ -211,7 +328,12 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			conexion.conectar();
 			
-			ps=conexion.getCon().prepareStatement("select * from cuentas where nro_cuenta=? ");
+			StringBuilder sb=new StringBuilder();
+			sb.append("select c.*, m.nombre as nombre_moneda from cuentas c ");
+			sb.append("inner join monedas m on c.id_moneda=m.id_moneda ");
+			sb.append("where c.nro_cuenta=?");
+			
+			ps=conexion.getCon().prepareStatement(sb.toString());
 			ps.setString(1, nroDeCuenta);
 			
 			rs=ps.executeQuery();
@@ -225,6 +347,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				}else{
 					c=new CuentaCorriente();
 				}
+				c.setNroDeCuenta(rs.getString("nro_cuenta"));
 				c.setDenominacion(rs.getString("denominacion"));
 				Moneda m=new Moneda();
 				m.setId(rs.getInt("id_moneda"));
@@ -294,6 +417,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				}else{
 					c=new CuentaCorriente();
 				}
+				c.setNroDeCuenta(rs.getString("nro_cuenta"));
 				c.setDenominacion(rs.getString("denominacion"));
 				Moneda m=new Moneda();
 				m.setId(rs.getInt("id_moneda"));
@@ -341,6 +465,9 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		PreparedStatement psOperacion=null;
 		PreparedStatement psTransaccion=null;
 		PreparedStatement psTransferencia=null;
+		PreparedStatement psResultado=null;
+		
+		ResultSet rsOperacion=null;
 		
 		boolean registrada=false;
 		
@@ -348,13 +475,16 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			conexion.conectar();
 			
-			psOperacion=conexion.getCon().prepareStatement("insert into operaciones (fecha_hora, imagen, id_acceso) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-			psTransaccion=conexion.getCon().prepareStatement("insert into transacciones (nro_operacion, importe, id_moneda) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-			psTransferencia=conexion.getCon().prepareStatement("insert into transferencias (nro_operacion, nro_cuenta_origen, nro_cuenta_destino) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			psOperacion=conexion.getCon().prepareStatement("insert into operaciones (fecha_hora, id_acceso, tipo) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			psTransaccion=conexion.getCon().prepareStatement("insert into transacciones (nro_operacion, importe, id_moneda) values (?,?,?)");
+			psTransferencia=conexion.getCon().prepareStatement("insert into transferencias (nro_operacion, nro_cuenta_origen, nro_cuenta_destino) values (?,?,?)");
+			psTransferencia=conexion.getCon().prepareStatement("insert into transferencias (nro_operacion, nro_cuenta_origen, nro_cuenta_destino) values (?,?,?)");
+			psResultado=conexion.getCon().prepareStatement("update operaciones set estado=?, mensaje=? where nro_operacion=?");
+
 			
 			psOperacion.setTimestamp(1, Timestamp.valueOf(transferencia.getFechaHora()));
-			psOperacion.setBytes(2, transferencia.getImagen());
-			psOperacion.setLong(3, transferencia.getAcceso().getId());
+			psOperacion.setLong(2, transferencia.getAcceso().getId());
+			psOperacion.setString(3, transferencia.getTipo());
 			
 			int cantFilasIntertadas=0;
 			
@@ -362,25 +492,37 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			if(cantFilasIntertadas > 0){
 				
-				transferencia.setNroOperacion(psOperacion.getGeneratedKeys().getLong(1));
-				
-				psTransaccion.setLong(1, transferencia.getNroOperacion());
-				psTransaccion.setDouble(1, transferencia.getImporte());
-				psTransaccion.setInt(1, transferencia.getMoneda().getId());
-				
-				cantFilasIntertadas=psTransaccion.executeUpdate();
-				
-				if(cantFilasIntertadas > 0){
+				rsOperacion=psOperacion.getGeneratedKeys();
+				if(rsOperacion.next()){
 					
-					psTransferencia.setLong(1, transferencia.getNroOperacion());
-					psTransferencia.setString(2, transferencia.getCuenta().getNroDeCuenta());
-					psTransferencia.setString(3, transferencia.getCuentaDestino().getNroDeCuenta());
+					transferencia.setNroOperacion(rsOperacion.getLong(1));
 					
-					cantFilasIntertadas=psTransferencia.executeUpdate();
+					psTransaccion.setLong(1, transferencia.getNroOperacion());
+					psTransaccion.setDouble(2, transferencia.getImporte());
+					psTransaccion.setInt(3, transferencia.getMoneda().getId());
+					
+					cantFilasIntertadas=psTransaccion.executeUpdate();
 					
 					if(cantFilasIntertadas > 0){
-						registrada=true;
+						
+						psTransferencia.setLong(1, transferencia.getNroOperacion());
+						psTransferencia.setString(2, transferencia.getCuenta().getNroDeCuenta());
+						psTransferencia.setString(3, transferencia.getCuentaDestino().getNroDeCuenta());
+						
+						cantFilasIntertadas=psTransferencia.executeUpdate();
+						
+						if(cantFilasIntertadas > 0){
+							registrada=false;
+							estado="OK";
+							mensaje="Operación registrada";
+							psResultado.setString(1, estado);
+							psResultado.setString(2, mensaje);
+							psResultado.setLong(3, transferencia.getNroOperacion());
+							psResultado.executeUpdate();
+						}
+						
 					}
+
 					
 				}
 				
@@ -389,16 +531,22 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			estado="ERROR";
+			mensaje=e.getMessage();
 			throw new SistemaBancoException(e);
 		} catch (DBException e) {
+			estado="ERROR";
+			mensaje=e.getMessage();
 			e.printStackTrace();
 			throw new SistemaBancoException(e);
 		}finally{
 			
 				try {
+					if(rsOperacion!=null) rsOperacion.close();
 					if(psOperacion!=null) psOperacion.close();
 					if(psTransaccion!=null) psTransaccion.close();
 					if(psTransferencia!=null) psTransferencia.close();
+					if(psResultado!=null) psResultado.close();
 					conexion.desconectar();
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -410,10 +558,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 	
 		}
 		
-		if(registrada){
-			ro.setEstado("OK");
-			ro.setMensaje("Operación registrada");
-		}else{
+		if(!registrada){
 			ro.setEstado("ERROR");
 			ro.setMensaje("Operación no registrada");
 		}
@@ -532,7 +677,6 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		String nroCuentaOrigen=null;
 		String nroCuentaDestino=null;
-		Cliente c=null;
 		
 		try{
 			
@@ -568,8 +712,9 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				m.setId(rs.getInt("id_moneda"));
 				t.setMoneda(m);
 				
-				c=new Cliente();
-				c.setId(rs.getLong("id_cliente"));
+				Acceso a=new Acceso();
+				a.setId(rs.getLong("id_acceso"));
+				t.setAcceso(a);
 				
 				nroCuentaOrigen=rs.getString("nro_cuenta_origen");
 				nroCuentaDestino=rs.getString("nro_cuenta_destino");				
@@ -602,7 +747,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			
 			t.setCuenta(this.obtCuenta(nroCuentaOrigen));
 			t.setCuentaDestino(this.obtCuenta(nroCuentaDestino));
-			t.setAcceso(this.obtAcceso(c));
+			t.setAcceso(this.obtAcceso(t.getAcceso().getId()));
 			
 		}
 		
