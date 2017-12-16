@@ -5,6 +5,7 @@ import java.util.List;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 
 public interface SistemaBanco {
 
@@ -23,6 +24,11 @@ public interface SistemaBanco {
 	Acceso obtAcceso(Long id) throws SistemaBancoException;
 
 	Cliente obtCliente(Long id) throws SistemaBancoException;
+	
+	public boolean registrarMovimiento(MovimientoCuenta mc) 
+			throws SistemaBancoException;
+	
+	void actualizarSaldoCuenta(Cuenta cuenta) throws SistemaBancoException;
 	
 	
 

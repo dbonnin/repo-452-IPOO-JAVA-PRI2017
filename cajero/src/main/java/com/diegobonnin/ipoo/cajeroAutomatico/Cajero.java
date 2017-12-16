@@ -6,6 +6,7 @@ import java.util.List;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Operacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
@@ -13,12 +14,40 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 public class Cajero {
 	
 	private Long id;
+	private String nombre;
+	private String direccion;
 	
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public SistemaBancoJDBC getBanco() {
+		return banco;
+	}
+
+	public void setBanco(SistemaBancoJDBC banco) {
+		this.banco = banco;
+	}
+
 	private SistemaBancoJDBC banco;
 	
 	public Cajero(){
 		banco=new SistemaBancoJDBC();
 		this.id=1l;
+		this.nombre="Cajero Palma";
+		this.direccion="Palma 555 casi Alberdi";
 	}
 	
 	public Cajero(Long id) {
@@ -71,6 +100,8 @@ public class Cajero {
 		transferencia.setFechaHora(LocalDateTime.now());
 		
 		Cuenta cuentaOrigen=null;
+		Cuenta cuentaDestino=null;
+		
 		try {
 			cuentaOrigen = banco.obtCuenta(nroCuentaOrigen);
 		} catch (SistemaBancoException e) {
@@ -82,7 +113,7 @@ public class Cajero {
 			
 			transferencia.setMoneda(cuentaOrigen.getMoneda());
 			
-			Cuenta cuentaDestino=null;
+			cuentaDestino=null;
 			try {
 				cuentaDestino = banco.obtCuenta(nroCuentaDestino);
 			} catch (SistemaBancoException e) {
@@ -129,10 +160,51 @@ public class Cajero {
 		}
 		
 		transferencia.setResultado(ro);
+		System.out.println(ro);
+		
+		if("OK".equals(transferencia.getResultado().getEstado())){
+			
+			registrarMovimiento(cuentaOrigen, importe, acceso, transferencia, "D");
+			cuentaOrigen.setSaldoDisponible(cuentaOrigen.getSaldoDisponible() - importe);
+			try {
+				banco.actualizarSaldoCuenta(cuentaOrigen);
+			} catch (SistemaBancoException e) {
+				e.printStackTrace();
+			}
+			
+			registrarMovimiento(cuentaDestino, importe, acceso, transferencia, "C");
+			cuentaDestino.setSaldoDisponible(cuentaDestino.getSaldoDisponible() + importe);
+			try {
+				banco.actualizarSaldoCuenta(cuentaDestino);
+			} catch (SistemaBancoException e) {
+				e.printStackTrace();
+			}
+			
+		}
 		
 		return transferencia;
 		
 		
+	}
+	
+	private void registrarMovimiento(Cuenta cuenta, Double importe, Acceso acceso, Operacion operacion, String sentido){
+		
+		MovimientoCuenta mc=new MovimientoCuenta();
+		mc.setCuenta(cuenta);
+		mc.setImporte(importe);
+		mc.setDescripcion("Operación en ATM - " + acceso.getCajero().getId()
+		+ " - " + acceso.getCajero().getNombre()
+		+ " - " + acceso.getCajero().getDireccion());
+		
+		mc.setFechaHora(LocalDateTime.now());
+		mc.setOperacion(operacion);
+		mc.setSentido(sentido);
+		
+		try {
+			banco.registrarMovimiento(mc);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Long getId() {

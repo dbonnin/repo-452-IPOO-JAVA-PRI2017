@@ -18,6 +18,7 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.CuentaCorriente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.CuentaDeAhorro;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Moneda;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Operacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
@@ -478,7 +479,6 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			psOperacion=conexion.getCon().prepareStatement("insert into operaciones (fecha_hora, id_acceso, tipo) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
 			psTransaccion=conexion.getCon().prepareStatement("insert into transacciones (nro_operacion, importe, id_moneda) values (?,?,?)");
 			psTransferencia=conexion.getCon().prepareStatement("insert into transferencias (nro_operacion, nro_cuenta_origen, nro_cuenta_destino) values (?,?,?)");
-			psTransferencia=conexion.getCon().prepareStatement("insert into transferencias (nro_operacion, nro_cuenta_origen, nro_cuenta_destino) values (?,?,?)");
 			psResultado=conexion.getCon().prepareStatement("update operaciones set estado=?, mensaje=? where nro_operacion=?");
 
 			
@@ -493,6 +493,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			if(cantFilasIntertadas > 0){
 				
 				rsOperacion=psOperacion.getGeneratedKeys();
+				
 				if(rsOperacion.next()){
 					
 					transferencia.setNroOperacion(rsOperacion.getLong(1));
@@ -512,7 +513,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 						cantFilasIntertadas=psTransferencia.executeUpdate();
 						
 						if(cantFilasIntertadas > 0){
-							registrada=false;
+							registrada=true;
 							estado="OK";
 							mensaje="Operación registrada";
 							psResultado.setString(1, estado);
@@ -521,9 +522,15 @@ public class SistemaBancoJDBC implements SistemaBanco {
 							psResultado.executeUpdate();
 						}
 						
+					}else{
+						estado="ERROR";
+						mensaje="Transacción registrada";
 					}
 
 					
+				}else{
+					estado="ERROR";
+					mensaje="Operación registrada";
 				}
 				
 			}
@@ -558,10 +565,8 @@ public class SistemaBancoJDBC implements SistemaBanco {
 	
 		}
 		
-		if(!registrada){
-			ro.setEstado("ERROR");
-			ro.setMensaje("Operación no registrada");
-		}
+		ro.setEstado(estado);
+		ro.setMensaje(mensaje);
 		
 		return ro;
 		
@@ -753,6 +758,108 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		return t;
 		
+	}
+
+
+	@Override
+	public void actualizarSaldoCuenta(Cuenta cuenta) throws SistemaBancoException {
+		
+		System.out.println("SD: " + cuenta.getSaldoDisponible());
+		System.out.println(cuenta.getNroDeCuenta());
+		
+		PreparedStatement ps=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			ps=conexion.getCon().prepareStatement("update cuentas set saldo_disponible=? where nro_cuenta=?");
+			ps.setDouble(1, cuenta.getSaldoDisponible());
+			ps.setString(2, cuenta.getNroDeCuenta());
+			
+			int filasActualizadas=ps.executeUpdate();
+			
+			if(filasActualizadas==0){
+				throw new SistemaBancoException("No se pudo actualizar el saldo de la cuenta: " + cuenta.getNroDeCuenta());
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+	}
+
+	@Override
+	public boolean registrarMovimiento(MovimientoCuenta mc) throws SistemaBancoException {
+		
+		boolean insertado=false;
+		
+		PreparedStatement ps=null;
+		
+		try{
+			
+			// conecta a la base de datos
+			conexion.conectar();
+			StringBuilder sb=new StringBuilder();
+			
+			sb.append("insert into movimientos_cuentas(fecha_hora, ");
+			sb.append("importe, nro_cuenta, descripcion, tipo, nro_comprobante, sentido) ");
+			sb.append("values (?, ?, ?, ?, ?, ?, ?)");
+			
+			ps=conexion.getCon().prepareStatement(sb.toString());
+			
+			ps.setTimestamp(1, Timestamp.valueOf(mc.getFechaHora()));
+			ps.setDouble(2, mc.getImporte());
+			ps.setString(3,  mc.getCuenta().getNroDeCuenta());
+			ps.setString(4, mc.getDescripcion());
+			ps.setString(5,  mc.getTipo());
+			ps.setLong(6, mc.getOperacion().getNroOperacion());
+			ps.setString(7, mc.getSentido());
+			
+			int filasInsertadas=ps.executeUpdate();
+			if(filasInsertadas > 0) insertado=true;
+			
+			
+			
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			if(ps!=null)
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			try {
+				conexion.desconectar();
+			} catch (DBException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return insertado;
 	}
 	
 

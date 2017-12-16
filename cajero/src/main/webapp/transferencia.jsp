@@ -37,8 +37,8 @@
 					<label for="importe">Importe: </label>
 					<input type="number" name="importe">
 				</li>				
-				<input type="submit" value="Transferir" />
-				<a href="transferencia" class="btn btn-info" role="button">Cancelar</a>
+				<input type="submit" class="btn btn-success" value="Transferir" />
+				<a href="inicio" class="btn btn-danger" role="button">Cancelar</a>
 			</ul>
 		</form>
 	</div>
