@@ -1,10 +1,16 @@
-drop table transferencias;
-drop table transacciones;
-drop table operaciones;
-drop table cuentas_clientes;
-drop table cuentas;
-drop table clientes;
-drop table accesos;
+-- Database: cajero
+
+-- DROP DATABASE cajero;
+
+CREATE DATABASE cajero
+  WITH OWNER = postgres
+       ENCODING = 'UTF8'
+       TABLESPACE = pg_default
+       LC_COLLATE = 'C'
+       LC_CTYPE = 'C'
+       CONNECTION LIMIT = -1;
+
+
 
 
 -- DROP TABLE cajeros;
