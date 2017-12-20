@@ -764,9 +764,6 @@ public class SistemaBancoJDBC implements SistemaBanco {
 	@Override
 	public void actualizarSaldoCuenta(Cuenta cuenta) throws SistemaBancoException {
 		
-		System.out.println("SD: " + cuenta.getSaldoDisponible());
-		System.out.println(cuenta.getNroDeCuenta());
-		
 		PreparedStatement ps=null;
 		
 		try{

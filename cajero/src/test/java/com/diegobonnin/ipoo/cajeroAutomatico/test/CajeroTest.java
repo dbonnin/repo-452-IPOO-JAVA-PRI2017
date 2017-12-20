@@ -25,11 +25,11 @@ public class CajeroTest {
 		List<Cuenta> l=c.obtCuentas(a.getCliente());
 		assertFalse(l.isEmpty());
 		assertNotNull(l.get(0).getNroDeCuenta());
-		System.out.println(l.get(0));
 		System.out.println(l.get(1));
+		System.out.println(l.get(2));
 		assertTrue(l.get(1).getMoneda().equals(l.get(1).getMoneda()));
 		
-		Transferencia t=c.transferencia(a, l.get(0).getNroDeCuenta(), l.get(1).getNroDeCuenta(), 1000.0d);
+		Transferencia t=c.transferencia(a, l.get(1).getNroDeCuenta(), l.get(2).getNroDeCuenta(), 5000.0d);
 		System.out.println(t);
 		assertNotNull(t);
 		assertNotNull(t.getResultado().getEstado());

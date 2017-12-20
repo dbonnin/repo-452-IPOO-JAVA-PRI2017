@@ -160,24 +160,28 @@ public class Cajero {
 		}
 		
 		transferencia.setResultado(ro);
-		System.out.println(ro);
 		
 		if("OK".equals(transferencia.getResultado().getEstado())){
 			
-			registrarMovimiento(cuentaOrigen, importe, acceso, transferencia, "D");
-			cuentaOrigen.setSaldoDisponible(cuentaOrigen.getSaldoDisponible() - importe);
-			try {
-				banco.actualizarSaldoCuenta(cuentaOrigen);
-			} catch (SistemaBancoException e) {
-				e.printStackTrace();
+			boolean registradoCuentaOrigen=registrarMovimiento(cuentaOrigen, importe, acceso, transferencia, "D");
+			
+			if(registradoCuentaOrigen==true){
+				cuentaOrigen.setSaldoDisponible(cuentaOrigen.getSaldoDisponible() - importe);
+				try {
+					banco.actualizarSaldoCuenta(cuentaOrigen);
+				} catch (SistemaBancoException e) {
+					e.printStackTrace();
+				}
 			}
 			
-			registrarMovimiento(cuentaDestino, importe, acceso, transferencia, "C");
-			cuentaDestino.setSaldoDisponible(cuentaDestino.getSaldoDisponible() + importe);
-			try {
-				banco.actualizarSaldoCuenta(cuentaDestino);
-			} catch (SistemaBancoException e) {
-				e.printStackTrace();
+			boolean registradoCuentaDestino=registrarMovimiento(cuentaDestino, importe, acceso, transferencia, "C");
+			if(registradoCuentaDestino==true){
+				cuentaDestino.setSaldoDisponible(cuentaDestino.getSaldoDisponible() + importe);
+				try {
+					banco.actualizarSaldoCuenta(cuentaDestino);
+				} catch (SistemaBancoException e) {
+					e.printStackTrace();
+				}
 			}
 			
 		}
@@ -187,24 +191,32 @@ public class Cajero {
 		
 	}
 	
-	private void registrarMovimiento(Cuenta cuenta, Double importe, Acceso acceso, Operacion operacion, String sentido){
+	private boolean registrarMovimiento(Cuenta cuenta, Double importe, Acceso acceso, Operacion operacion, String sentido){
+
+		boolean resultado=false;
 		
 		MovimientoCuenta mc=new MovimientoCuenta();
 		mc.setCuenta(cuenta);
 		mc.setImporte(importe);
-		mc.setDescripcion("Operación en ATM - " + acceso.getCajero().getId()
+		mc.setDescripcion("Operación en ATM - " 
+				+ acceso.getCajero().getId()
 		+ " - " + acceso.getCajero().getNombre()
-		+ " - " + acceso.getCajero().getDireccion());
+		+ " - " + acceso.getCajero().getDireccion()
+		);
 		
 		mc.setFechaHora(LocalDateTime.now());
 		mc.setOperacion(operacion);
 		mc.setSentido(sentido);
+		mc.setTipo(operacion.getTipo());
 		
 		try {
-			banco.registrarMovimiento(mc);
+			resultado=banco.registrarMovimiento(mc);
 		} catch (SistemaBancoException e) {
 			e.printStackTrace();
 		}
+		
+		return resultado;
+		
 	}
 
 	public Long getId() {

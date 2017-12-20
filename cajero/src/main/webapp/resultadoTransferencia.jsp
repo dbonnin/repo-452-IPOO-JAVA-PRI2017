@@ -54,7 +54,7 @@
 			</c:otherwise>
 		</c:choose>
 		<p>
-			<a href="transferencia" class="btn btn-info" role="button">Cancelar</a>
+			<a href="inicio" class="btn btn-info" role="button">Volver</a>
 		</p>
 	</div>
 	<footer>

@@ -1,7 +1,6 @@
 package com.diegobonnin.ipoo.cajeroAutomatico.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +13,7 @@ import com.diegobonnin.ipoo.cajeroAutomatico.SistemaBancoJDBC;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 
@@ -40,6 +40,20 @@ public class SistemaBancoJDBCTest {
 			ResultadoOperacion ro=banco.registrarOperacion(t);
 			assertNotNull(ro);
 			System.out.println(ro);
+			
+			MovimientoCuenta mc=new MovimientoCuenta();
+			mc.setCuenta(t.getCuenta());
+			mc.setImporte(t.getImporte());
+			mc.setDescripcion("Operación en ATM - " + a.getCajero().getId()
+			+ " - " + a.getCajero().getNombre()
+			+ " - " + a.getCajero().getDireccion());
+			
+			mc.setFechaHora(LocalDateTime.now());
+			mc.setOperacion(t);
+			mc.setSentido("D");
+			
+			assertTrue(banco.registrarMovimiento(mc));
+			
 		} catch (SistemaBancoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
