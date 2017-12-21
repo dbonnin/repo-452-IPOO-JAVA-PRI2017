@@ -8,6 +8,8 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Operacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.PagoPrestamo;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.Prestamo;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 
@@ -237,6 +239,14 @@ public class Cajero {
 		} catch (SistemaBancoException e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	public PagoPrestamo pagoPrestamo(Acceso a, String nroPrestamo, Double _importe) {
+		return null;
+	}
+
+	public List<Prestamo> obtPrestamos(Cliente cliente) {
 		return null;
 	}
 

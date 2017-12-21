@@ -7,6 +7,7 @@ public class CuotaPrestamo {
 	private Integer nroCuota;
 	private LocalDate fechaVencimiento;
 	private Double importe;
+	private Double importePagado;
 	private Prestamo prestamo;
 	
 	public CuotaPrestamo(){
@@ -47,6 +48,14 @@ public class CuotaPrestamo {
 
 	public void setPrestamo(Prestamo prestamo) {
 		this.prestamo = prestamo;
+	}
+
+	public Double getImportePagado() {
+		return importePagado;
+	}
+
+	public void setImportePagado(Double importePagado) {
+		this.importePagado = importePagado;
 	}
 
 	
