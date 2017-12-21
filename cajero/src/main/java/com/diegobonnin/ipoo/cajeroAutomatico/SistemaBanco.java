@@ -6,6 +6,7 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.Tarjeta;
 
 public interface SistemaBanco {
 
@@ -29,6 +30,8 @@ public interface SistemaBanco {
 			throws SistemaBancoException;
 	
 	void actualizarSaldoCuenta(Cuenta cuenta) throws SistemaBancoException;
+
+	List<Tarjeta> obtTarjetas(Cliente cliente) throws SistemaBancoException;
 	
 	
 

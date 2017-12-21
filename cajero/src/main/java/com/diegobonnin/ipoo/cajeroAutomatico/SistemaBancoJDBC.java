@@ -20,7 +20,9 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.CuentaDeAhorro;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Moneda;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Operacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.PagoTarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.Tarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 
 public class SistemaBancoJDBC implements SistemaBanco {
@@ -455,7 +457,83 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		return cuentas;
 		
+	}
+	
+	@Override
+	public List<Tarjeta> obtTarjetas(Cliente cliente) throws SistemaBancoException {
+		
+		List<Tarjeta> tarjetas=new ArrayList<>();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			StringBuilder sb=new StringBuilder();
+			sb.append("select t.*, m.nombre as nombre_moneda from tarjetas t ");
+			sb.append("inner join monedas m on t.id_moneda=m.id_moneda ");
+			sb.append("where t.id_cliente=?");
+			
+			ps=conexion.getCon().prepareStatement(sb.toString());
+			ps.setLong(1, cliente.getId());
+			
+			rs=ps.executeQuery();
+			
+			
+			while(rs.next()){
+				
+				Tarjeta t=new Tarjeta();
+				
+				t.setNroTarjeta(rs.getString("nro_tarjeta"));
+
+				t.setLineaDeCredito(rs.getDouble("linea_de_credito"));
+				t.setSaldoActual(rs.getDouble("saldo_actual"));
+				t.setSaldoDisponible(rs.getDouble("saldo_disponible"));
+				
+				t.setFechaVencimiento(new Date(
+						rs.getDate("fecha_nacimiento").getTime())
+						.toInstant().atZone(ZoneId.systemDefault())
+						.toLocalDate());
+				
+				t.setPagoMinimo(rs.getDouble("pago_minimo"));
+
+				Moneda m=new Moneda();
+				m.setId(rs.getInt("id_moneda"));
+				m.setNombre(rs.getString("nombre_moneda"));
+				t.setMoneda(m);
+				
+				tarjetas.add(t);
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(rs!=null)rs.close();
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+		return tarjetas;
+		
 	}	
+	
 	
 	public ResultadoOperacion registrarOperacion(Transferencia transferencia) throws SistemaBancoException  {
 		
@@ -570,7 +648,121 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		return ro;
 		
-	}	
+	}
+	
+	public ResultadoOperacion registrarOperacion(PagoTarjeta pagoTarjeta) throws SistemaBancoException  {
+		
+		ResultadoOperacion ro=new ResultadoOperacion();
+		String estado=null;
+		String mensaje=null;
+		
+		PreparedStatement psOperacion=null;
+		PreparedStatement psTransaccion=null;
+		PreparedStatement psPagoTarjeta=null;
+		PreparedStatement psResultado=null;
+		
+		ResultSet rsOperacion=null;
+		
+		boolean registrada=false;
+		
+		try{
+			
+			conexion.conectar();
+			
+			psOperacion=conexion.getCon().prepareStatement("insert into operaciones (fecha_hora, id_acceso, tipo) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			psTransaccion=conexion.getCon().prepareStatement("insert into transacciones (nro_operacion, importe, id_moneda) values (?,?,?)");
+			psPagoTarjeta=conexion.getCon().prepareStatement("insert into pagos_tarjetas (nro_operacion, nro_tarjeta) values (?,?)");
+			psResultado=conexion.getCon().prepareStatement("update operaciones set estado=?, mensaje=? where nro_operacion=?");
+
+			
+			psOperacion.setTimestamp(1, Timestamp.valueOf(pagoTarjeta.getFechaHora()));
+			psOperacion.setLong(2, pagoTarjeta.getAcceso().getId());
+			psOperacion.setString(3, pagoTarjeta.getTipo());
+			
+			int cantFilasIntertadas=0;
+			
+			cantFilasIntertadas=psOperacion.executeUpdate();
+			
+			if(cantFilasIntertadas > 0){
+				
+				rsOperacion=psOperacion.getGeneratedKeys();
+				
+				if(rsOperacion.next()){
+					
+					pagoTarjeta.setNroOperacion(rsOperacion.getLong(1));
+					
+					psTransaccion.setLong(1, pagoTarjeta.getNroOperacion());
+					psTransaccion.setDouble(2, pagoTarjeta.getImporte());
+					psTransaccion.setInt(3, pagoTarjeta.getMoneda().getId());
+					
+					cantFilasIntertadas=psTransaccion.executeUpdate();
+					
+					if(cantFilasIntertadas > 0){
+						
+						psPagoTarjeta.setLong(1, pagoTarjeta.getNroOperacion());
+						psPagoTarjeta.setString(2, pagoTarjeta.getTarjeta().getNroTarjeta());
+						
+						cantFilasIntertadas=psPagoTarjeta.executeUpdate();
+						
+						if(cantFilasIntertadas > 0){
+							registrada=true;
+							estado="OK";
+							mensaje="Operación registrada";
+							psResultado.setString(1, estado);
+							psResultado.setString(2, mensaje);
+							psResultado.setLong(3, pagoTarjeta.getNroOperacion());
+							psResultado.executeUpdate();
+						}
+						
+					}else{
+						estado="ERROR";
+						mensaje="Transacción registrada";
+					}
+
+					
+				}else{
+					estado="ERROR";
+					mensaje="Operación registrada";
+				}
+				
+			}
+						
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			estado="ERROR";
+			mensaje=e.getMessage();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			estado="ERROR";
+			mensaje=e.getMessage();
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(rsOperacion!=null) rsOperacion.close();
+					if(psOperacion!=null) psOperacion.close();
+					if(psTransaccion!=null) psTransaccion.close();
+					if(psPagoTarjeta!=null) psPagoTarjeta.close();
+					if(psResultado!=null) psResultado.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+		ro.setEstado(estado);
+		ro.setMensaje(mensaje);
+		
+		return ro;
+		
+	}		
 	
 	public void finalizarSesion(Acceso acceso) throws SistemaBancoException{
 		
