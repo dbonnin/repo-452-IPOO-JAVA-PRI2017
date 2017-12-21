@@ -14,7 +14,9 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Acceso;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.PagoTarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.Tarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 
 public class SistemaBancoJDBCTest {
@@ -53,6 +55,26 @@ public class SistemaBancoJDBCTest {
 			mc.setSentido("D");
 			
 			assertTrue(banco.registrarMovimiento(mc));
+			
+			List<Tarjeta> tarjetas=banco.obtTarjetas(c);
+			assertFalse(tarjetas.isEmpty());
+			
+			PagoTarjeta pc=new PagoTarjeta();
+			pc.setAcceso(a);
+			pc.setTarjeta(tarjetas.get(0));
+			pc.setImporte(55000.0d);
+			pc.setFechaHora(LocalDateTime.now());
+			pc.setTipo("PAGO_TARJETA");
+			pc.setMoneda(tarjetas.get(0).getMoneda());
+			
+			ResultadoOperacion rot=banco.registrarOperacion(pc);
+			assertNotNull(rot);
+			assertTrue("OK".equals(rot.getEstado()));
+			
+			Tarjeta tar=tarjetas.get(0);
+			tar.setSaldoActual(tar.getSaldoActual() - pc.getImporte());
+			tar.setSaldoDisponible(tar.getSaldoDisponible() + pc.getImporte());
+			banco.actualizarSaldoTarjeta(tar);
 			
 		} catch (SistemaBancoException e) {
 			// TODO Auto-generated catch block

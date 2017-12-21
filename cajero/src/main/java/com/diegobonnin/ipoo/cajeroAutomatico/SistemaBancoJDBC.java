@@ -493,7 +493,7 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				t.setSaldoDisponible(rs.getDouble("saldo_disponible"));
 				
 				t.setFechaVencimiento(new Date(
-						rs.getDate("fecha_nacimiento").getTime())
+						rs.getDate("fecha_vencimiento").getTime())
 						.toInstant().atZone(ZoneId.systemDefault())
 						.toLocalDate());
 				
@@ -505,6 +505,8 @@ public class SistemaBancoJDBC implements SistemaBanco {
 				t.setMoneda(m);
 				
 				tarjetas.add(t);
+				
+
 				
 			}
 			

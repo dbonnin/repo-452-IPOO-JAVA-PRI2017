@@ -8,7 +8,9 @@ import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cliente;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Cuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.MovimientoCuenta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Operacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.PagoTarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.ResultadoOperacion;
+import com.diegobonnin.ipoo.cajeroAutomatico.datos.Tarjeta;
 import com.diegobonnin.ipoo.cajeroAutomatico.datos.Transferencia;
 
 public class Cajero {
@@ -63,6 +65,16 @@ public class Cajero {
 		return null;
 	}
 	
+	public List<Tarjeta> obtTarjetas(Cliente cliente){
+		try {
+			return banco.obtTarjetas(cliente);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
 	public Acceso autenticar(String tipoDoc, String nroDoc, String password, String ip) {
 		
 		Cliente c=null;
@@ -85,6 +97,72 @@ public class Cajero {
 		return null;
 		
 	}
+	
+	public PagoTarjeta pagoTarjeta(Acceso acceso, String nroTarjeta, Double importe){
+		
+		PagoTarjeta pagoTarjeta=new PagoTarjeta();
+		
+		ResultadoOperacion ro=null;
+		
+		String estado=null;
+		String mensaje=null;
+		
+		pagoTarjeta.setAcceso(acceso);
+		pagoTarjeta.setImporte(importe);
+		pagoTarjeta.setFechaHora(LocalDateTime.now());
+		
+		Tarjeta tarjeta=null;
+		
+		try {
+			tarjeta = banco.obtTarjeta(nroTarjeta);
+		} catch (SistemaBancoException e) {
+			e.printStackTrace();
+		}
+		
+		
+		if(tarjeta!=null){
+			
+			pagoTarjeta.setMoneda(tarjeta.getMoneda());
+			
+			try {
+				ro=banco.registrarOperacion(pagoTarjeta);
+			} catch (SistemaBancoException e) {
+				e.printStackTrace();
+			}
+			
+		}else{
+			estado="ERROR";
+			mensaje="Tarjeta inexistente";
+		}
+		
+		if(ro==null){
+			ro=new ResultadoOperacion(estado, mensaje);
+		}
+		
+		pagoTarjeta.setResultado(ro);
+		
+		if("OK".equals(pagoTarjeta.getResultado().getEstado())){
+			
+			boolean registradoMovimiento=registrarMovimiento(tarjeta, importe, acceso, pagoTarjeta, "C");
+			
+			if(registradoMovimiento==true){
+				
+				tarjeta.setSaldoActual(tarjeta.getSaldoActual() - pagoTarjeta.getImporte());
+				tarjeta.setSaldoDisponible(tarjeta.getSaldoDisponible() + pagoTarjeta.getImporte());
+
+				try {
+					banco.actualizarSaldoTarjeta(tarjeta);
+				} catch (SistemaBancoException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		return pagoTarjeta;
+		
+		
+	}	
 	
 	public Transferencia transferencia(Acceso acceso, String nroCuentaOrigen, String nroCuentaDestino, Double importe){
 		
