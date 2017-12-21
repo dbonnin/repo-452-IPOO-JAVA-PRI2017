@@ -1143,6 +1143,11 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		
 		return insertado;
 	}
+
+	public Tarjeta obtTarjeta(String nroTarjeta)throws SistemaBancoException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 
