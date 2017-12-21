@@ -673,7 +673,6 @@ public class SistemaBancoJDBC implements SistemaBanco {
 			psTransaccion=conexion.getCon().prepareStatement("insert into transacciones (nro_operacion, importe, id_moneda) values (?,?,?)");
 			psPagoTarjeta=conexion.getCon().prepareStatement("insert into pagos_tarjetas (nro_operacion, nro_tarjeta) values (?,?)");
 			psResultado=conexion.getCon().prepareStatement("update operaciones set estado=?, mensaje=? where nro_operacion=?");
-
 			
 			psOperacion.setTimestamp(1, Timestamp.valueOf(pagoTarjeta.getFechaHora()));
 			psOperacion.setLong(2, pagoTarjeta.getAcceso().getId());
@@ -995,6 +994,98 @@ public class SistemaBancoJDBC implements SistemaBanco {
 		}
 		
 	}
+	
+	@Override
+	public void eliminarAcceso(Acceso acceso) throws SistemaBancoException {
+		
+		PreparedStatement ps=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			ps=conexion.getCon().prepareStatement("delete from accesos where id_acceso=?");
+			
+			ps.setLong(1, acceso.getId());
+			
+			int filasEliminadas=ps.executeUpdate();
+			
+			if(filasEliminadas==0){
+				throw new SistemaBancoException("No se pudo eliminar el acceso: " + acceso.getId());
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+	}
+	
+	@Override
+	public void actualizarSaldoTarjeta(Tarjeta tarjeta) throws SistemaBancoException {
+		
+		PreparedStatement ps=null;
+		
+		try{
+			
+			conexion.conectar();
+			
+			StringBuilder sb=new StringBuilder();
+			sb.append("update tarjetas set saldo_actual=?, saldo_disponible=? "); 
+			sb.append("where nro_tarjeta=?");
+			
+			ps=conexion.getCon().prepareStatement(sb.toString());
+			
+			ps.setDouble(1, tarjeta.getSaldoActual());
+			ps.setDouble(2, tarjeta.getSaldoDisponible());
+			ps.setString(3, tarjeta.getNroTarjeta());
+			
+			int filasActualizadas=ps.executeUpdate();
+			
+			if(filasActualizadas==0){
+				throw new SistemaBancoException("No se pudo actualizar el saldo de la tarjeta: " + tarjeta.getNroTarjeta());
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new SistemaBancoException(e);
+		}finally{
+			
+				try {
+					if(ps!=null) ps.close();
+					conexion.desconectar();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				} catch (DBException e) {
+					e.printStackTrace();
+					throw new SistemaBancoException(e);
+				}
+	
+		}
+		
+	}	
+	
 
 	@Override
 	public boolean registrarMovimiento(MovimientoCuenta mc) throws SistemaBancoException {

@@ -32,6 +32,10 @@ public interface SistemaBanco {
 	void actualizarSaldoCuenta(Cuenta cuenta) throws SistemaBancoException;
 
 	List<Tarjeta> obtTarjetas(Cliente cliente) throws SistemaBancoException;
+
+	void actualizarSaldoTarjeta(Tarjeta tarjeta) throws SistemaBancoException;
+
+	void eliminarAcceso(Acceso acceso) throws SistemaBancoException;
 	
 	
 
